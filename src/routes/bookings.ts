@@ -9,7 +9,6 @@ export function createBookingRouter(db: DatabaseSync): Router {
   const router = Router();
   const bookingService = new BookingService(db);
 
-  // POST /bookings - Book an available slot
   router.post('/', (req: Request, res: Response, next: NextFunction) => {
     try {
       const { slot_id, patient_name, patient_email, patient_phone } = req.body || {};
@@ -40,7 +39,6 @@ export function createBookingRouter(db: DatabaseSync): Router {
     }
   });
 
-  // GET /bookings/:id - Get booking details
   router.get('/:id', (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = String(req.params.id);
@@ -51,7 +49,6 @@ export function createBookingRouter(db: DatabaseSync): Router {
     }
   });
 
-  // POST /bookings/:id/cancel - Cancel a booking & reopen slot
   router.post('/:id/cancel', (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = String(req.params.id);
