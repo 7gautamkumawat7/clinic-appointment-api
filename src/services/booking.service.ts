@@ -11,7 +11,6 @@ export class BookingService {
     const { slot_id, patient_name, patient_email, patient_phone } = dto;
 
     return withTransaction(this.db, () => {
-      // 1. Verify slot existence & state
       const slot = this.db.prepare('SELECT * FROM slots WHERE id = ?').get(slot_id) as unknown as Slot | undefined;
       if (!slot) {
         throw new HttpError(404, 'Slot not found');
@@ -23,7 +22,6 @@ export class BookingService {
         throw new HttpError(409, 'Slot is already booked');
       }
 
-      // 2. Atomic conditional update: guarantees only 1 request flips status from AVAILABLE to BOOKED
       const updateResult = this.db
         .prepare(`UPDATE slots SET status = 'BOOKED' WHERE id = ? AND status = 'AVAILABLE'`)
         .run(slot_id);
@@ -32,7 +30,6 @@ export class BookingService {
         throw new HttpError(409, 'Slot was just booked by another request');
       }
 
-      // 3. Insert confirmed booking record (guaranteed by DB partial unique index)
       const bookingId = randomUUID();
       this.db
         .prepare(`
@@ -71,12 +68,10 @@ export class BookingService {
         throw new HttpError(409, 'Booking is already cancelled');
       }
 
-      // Mark booking cancelled
       this.db
         .prepare(`UPDATE bookings SET status = 'CANCELLED', cancellation_reason = ? WHERE id = ?`)
         .run(reason || 'Patient cancelled', id);
 
-      // Reopen slot to AVAILABLE if it was not clinic-cancelled
       this.db
         .prepare(`UPDATE slots SET status = 'AVAILABLE' WHERE id = ? AND status = 'BOOKED'`)
         .run(booking.slot_id);
