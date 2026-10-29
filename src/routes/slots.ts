@@ -7,7 +7,6 @@ export function createSlotRouter(db: DatabaseSync): Router {
   const router = Router();
   const slotService = new SlotService(db);
 
-  // POST /slots - Publish a new time slot
   router.post('/', (req: Request, res: Response, next: NextFunction) => {
     try {
       const { clinic_id, start_time, end_time } = req.body || {};
@@ -32,7 +31,6 @@ export function createSlotRouter(db: DatabaseSync): Router {
     }
   });
 
-  // GET /slots - List slots (with optional ?clinic_id=...&status=...)
   router.get('/', (req: Request, res: Response, next: NextFunction) => {
     try {
       const clinicId = typeof req.query.clinic_id === 'string' ? req.query.clinic_id : undefined;
@@ -45,7 +43,6 @@ export function createSlotRouter(db: DatabaseSync): Router {
     }
   });
 
-  // POST /slots/:id/cancel - Cancel a slot
   router.post('/:id/cancel', (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = String(req.params.id);

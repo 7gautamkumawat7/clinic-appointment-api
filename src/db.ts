@@ -3,10 +3,8 @@ import { DatabaseSync } from 'node:sqlite';
 export function createDatabase(dbPath: string = ':memory:'): DatabaseSync {
   const db = new DatabaseSync(dbPath);
 
-  // Enable foreign keys
   db.exec('PRAGMA foreign_keys = ON;');
 
-  // Schema: 2 core tables (slots and bookings)
   db.exec(`
     CREATE TABLE IF NOT EXISTS slots (
       id TEXT PRIMARY KEY,
@@ -29,7 +27,6 @@ export function createDatabase(dbPath: string = ':memory:'): DatabaseSync {
       created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
     );
 
-    -- HARD DATABASE CONSTRAINT: A slot can never have more than one CONFIRMED booking at a time
     CREATE UNIQUE INDEX IF NOT EXISTS uq_active_booking
     ON bookings (slot_id)
     WHERE status = 'CONFIRMED';

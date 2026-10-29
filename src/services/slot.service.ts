@@ -10,7 +10,6 @@ export class SlotService {
   createSlot(dto: CreateSlotDTO): Slot {
     const { clinic_id, start_time, end_time } = dto;
 
-    // Check for overlapping non-cancelled slot for this clinic
     const overlapStmt = this.db.prepare(`
       SELECT id FROM slots 
       WHERE clinic_id = ? 
@@ -67,7 +66,6 @@ export class SlotService {
         throw new HttpError(409, 'Slot is already cancelled');
       }
 
-      // If slot was booked, also cancel the active confirmed booking
       if (slot.status === 'BOOKED') {
         this.db.prepare(`
           UPDATE bookings 
