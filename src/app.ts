@@ -11,7 +11,6 @@ export function createApp(database?: DatabaseSync): Express {
 
   app.use(express.json());
 
-  // Root & Health Check
   app.get('/', (_req: Request, res: Response) => {
     res.json({
       message: 'Clinic Appointment Booking API is running!',
@@ -32,11 +31,9 @@ export function createApp(database?: DatabaseSync): Express {
     res.json({ status: 'ok', service: 'clinic-booking-api' });
   });
 
-  // Domain Routers
   app.use('/slots', createSlotRouter(db));
   app.use('/bookings', createBookingRouter(db));
 
-  // Centralized Error Handling Middleware
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     if (err instanceof HttpError) {
       return res.status(err.statusCode).json({ error: err.message });
